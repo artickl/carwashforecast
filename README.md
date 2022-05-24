@@ -17,4 +17,5 @@ Based on 3 day(s) period, best time to wash your car is in 1 day(s) with avearag
 Based on 7 day(s) period, best time to wash your car is in 10 day(s) with avearage of 22.14% chance (maximum 55% pop) of rain during this period.
 ```
 
-# need to think how to use it more efficiently (userfriendly)
+# TODO
+- need to think how to use it more efficiently (userfriendly)
