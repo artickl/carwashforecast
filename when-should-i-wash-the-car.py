@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Test Program."""
 from __future__ import annotations
 
@@ -77,7 +79,8 @@ async def main() -> None:
 
     duration=3
     good_pop=60
-    
+
+    #TODO: move it to parameters
     weatherbit = WeatherBitApiClient(
         "12c4f93fc60a4161b0685bad13519735",
         49.223004, -122.774502,

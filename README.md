@@ -19,3 +19,5 @@ Based on 7 day(s) period, best time to wash your car is in 10 day(s) with aveara
 
 # TODO
 - need to think how to use it more efficiently (userfriendly)
+- need to add key and coordinates into parameters
+- will be good to use city + country as an option, instead of coordinates
