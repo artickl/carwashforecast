@@ -6,6 +6,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
+import argparse
 
 from statistics import median
 
@@ -74,7 +75,6 @@ def print_wash(wash_list):
         print("Something wrong")
 
 async def main() -> None:
-    logging.basicConfig(level=logging.INFO)
     start = time.time()
 
     duration=3
@@ -128,4 +128,16 @@ async def main() -> None:
 
     _LOGGER.debug("Execution time: %s seconds", end - start)
 
-asyncio.run(main())
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Should you wash a car today?')
+    parser.add_argument('-a','--address', help='Provide your location, like full address, or city with region', required=True)
+    parser.add_argument('-d','--days', help='How many days you want to keep your car clean? (Default 3 days)', default='3')
+    parser.add_argument('-p','--percentage', help="What average probability of precipitation you want to use? (Default 50%%)", default='50')
+    parser.add_argument('--key',help="WeatherBitApiClient key if you have it", default='12c4f93fc60a4161b0685bad13519735"')
+    args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO)
+
+    #TODO: add arguments to the function
+    #TODO: rename function to something unique
+    asyncio.run(main())
