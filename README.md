@@ -1,23 +1,41 @@
-# carwashforecast
-Should I was the car today?
+# CarWashForecast
+Should I was the car today? If not - then when?
 
-
-# requirements
-https://github.com/briis/py-weatherbit
-
+# Requirements
+Python Wrapper for WeatherBit API
+- https://github.com/briis/py-weatherbit
 ```
 pip install pyweatherbitdata
 ```
 
-# how to use
+Free API key from https://www.weatherbit.io/
+- More info in https://github.com/briis/py-weatherbit#readme
+
+# How to use
 
 ```
-$ python3 when-should-i-wash-the-car.py
-Based on 3 day(s) period, best time to wash your car is in 1 day(s) with avearage of 16.67% chance (maximum 30% pop) of rain during this period.
-Based on 7 day(s) period, best time to wash your car is in 10 day(s) with avearage of 22.14% chance (maximum 55% pop) of rain during this period.
+$ ./when-should-i-wash-the-car.py -h
+usage: when-should-i-wash-the-car.py [-h] -a ADDRESS [-d DAYS] [-p PERCENTAGE] [--key KEY]
+
+Should you wash a car today?
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -a ADDRESS, --address ADDRESS
+                        Provide your location, like full address, or city with region (Coordinates are allowed too)
+  -d DAYS, --days DAYS  How many days you want to keep your car clean? (Default 3 days)
+  -p PERCENTAGE, --percentage PERCENTAGE
+                        What average probability of precipitation you want to use? (Default 50%)
+  --key KEY             WeatherBitApiClient key if you have it
+
+$ cp .env.example .env
+$ echo "KEY=######" > .env
+$ . .env
+
+$ ./when-should-i-wash-the-car.py -a "Maple Ridge" -d 7 -p 50 --key $KEY
+Based on 7 day(s) period, best time to wash your car is in 5 day(s) with average of 19.29% chance (maximum 35% pop) of rain during this period.
 ```
 
 # TODO
 - need to think how to use it more efficiently (userfriendly)
-- need to add key and coordinates into parameters
 - will be good to use city + country as an option, instead of coordinates

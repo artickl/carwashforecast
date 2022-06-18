@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-"""Test Program."""
-from __future__ import annotations
-
+"""Wash or not to wash the car"""
 import asyncio
 import logging
 import time
@@ -33,7 +31,7 @@ def list_less(lst,less):
             return 0
     return 1
 
-def wash(pop_list,threshold,duration):
+async def wash_or_not_to_wash(pop_list,threshold,duration):
     result = []
     p_list = []
     p_result = []
@@ -51,10 +49,10 @@ def wash(pop_list,threshold,duration):
     result.insert(0,p_result)
     return result
 
-def print_wash(wash_list):
+async def prettify_wash(wash_list):
     if len(wash_list)>1:
         str="Based on {} day(s) period, best time to wash your car is in {} day(s) " \
-            "with avearage of {:.2f}% chance (maximum {}% pop) of rain during this period."
+            "with average of {:.2f}% chance (maximum {}% pop) of rain during this period."
         print(str.format(
                 wash_list[1][0],
                 wash_list[1][1],
@@ -74,21 +72,19 @@ def print_wash(wash_list):
     else:
         print("Something wrong")
 
-async def main() -> None:
+async def check_weather(address,key,lang):
+    from coordinates import give_me_coordinates
     start = time.time()
+    (latitude,longitude)=give_me_coordinates(address)
 
-    duration=3
-    good_pop=60
-
-    #TODO: move it to parameters
     weatherbit = WeatherBitApiClient(
-        "12c4f93fc60a4161b0685bad13519735",
-        49.223004, -122.774502,
-        language="en",
+        key,
+        latitude, longitude,
+        language=lang,
     )
 
     try:
-        await weatherbit.initialize()
+       await weatherbit.initialize()
 
     except InvalidApiKey as err:
         _LOGGER.debug(err)
@@ -97,47 +93,42 @@ async def main() -> None:
     except ResultError as err:
         _LOGGER.debug(err)
 
-#    data: BaseDataDescription = weatherbit.station_data
-#    if data is not None:
-#        for field in data.__dataclass_fields__:
-#            value = getattr(data, field)
-#            print(field, "-", value)
-#
-#    data: ObservationDescription = await weatherbit.update_sensors()
-#    if data is not None:
-#        for field in data.__dataclass_fields__:
-#            value = getattr(data, field)
-#            print(field, "-", value)
-
     data: ForecastDescription = await weatherbit.update_forecast()
+    await weatherbit.req.close()
+    
+    end = time.time()
+    _LOGGER.debug("Execution time: %s seconds", end - start)
+    
     if data is not None:
-        #print(data.forecast)
-        
         pop = []
         for x in range(len(data.forecast)):
             pop.append(data.forecast[x].pop)
 
-        print_wash(wash(pop,50,3))
-        print_wash(wash(pop,60,7))
-
+        _LOGGER.debug("Weather data is %s", data)
         _LOGGER.debug("POP schedule %s", pop)
+     
+        return pop
+    else:
+        raise ValueError('Problem with weather. Cannot get information for the location.')
 
-    end = time.time()
-
-    await weatherbit.req.close()
-
-    _LOGGER.debug("Execution time: %s seconds", end - start)
+async def main():
+    weather_pops = await check_weather(args.address, args.key, "en")
+    wash = await wash_or_not_to_wash(weather_pops, args.percentage, args.days)
+    pretty = await prettify_wash(wash)
+    return pretty
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Should you wash a car today?')
-    parser.add_argument('-a','--address', help='Provide your location, like full address, or city with region', required=True)
-    parser.add_argument('-d','--days', help='How many days you want to keep your car clean? (Default 3 days)', default='3')
-    parser.add_argument('-p','--percentage', help="What average probability of precipitation you want to use? (Default 50%%)", default='50')
-    parser.add_argument('--key',help="WeatherBitApiClient key if you have it", default='12c4f93fc60a4161b0685bad13519735"')
+    parser.add_argument('-a','--address', help='Provide your location, like full address, or city with region (Coordinates are allowed too)', required=True)
+    parser.add_argument('-d','--days', help='How many days you want to keep your car clean? (Default 3 days)', type=int, default='3')
+    parser.add_argument('-p','--percentage', help="What average probability of precipitation you want to use? (Default 50%%)", type=int, default='50')
+    parser.add_argument('--key',help="WeatherBitApiClient key if you have it", default='12c4f93fc60a4161b0685bad13519735')
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO)
 
     #TODO: add arguments to the function
     #TODO: rename function to something unique
+#    asyncio.run(check_car_wash(args.days, args.percentage, args.address, args.key, "en"))
+
     asyncio.run(main())
