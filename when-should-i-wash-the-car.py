@@ -67,7 +67,7 @@ async def prettify_wash(wash_list):
             "Based on {} day(s) period, best time to wash your car is in {} day(s) "
             "with average of {:.2f}% chance (maximum {}% pop) of rain during this period."
         )
-        print(
+        return(
             str.format(
                 wash_list[1][0], wash_list[1][1], wash_list[1][3], wash_list[1][4]
             )
@@ -77,7 +77,7 @@ async def prettify_wash(wash_list):
             "Unfortunately based on {} day(s) period, no good time to wash your car (with less then {:.2f}% pop), "
             "best time to wash is in {} day(s) when average chance of rain will be {:.2f}% but with maximum change of {}."
         )
-        print(
+        return(
             str.format(
                 wash_list[0][0],
                 wash_list[0][1],
@@ -87,11 +87,11 @@ async def prettify_wash(wash_list):
             )
         )
     else:
-        print("Something wrong")
+        return("Something wrong")
 
 
 async def check_weather(address, key, lang):
-    from coordinates import give_me_coordinates
+    from plugin.carwashforecast.coordinates import give_me_coordinates
 
     start = time.time()
     (latitude, longitude) = give_me_coordinates(address)
@@ -134,10 +134,11 @@ async def check_weather(address, key, lang):
         )
 
 
-async def main():
-    weather_pops = await check_weather(args.address, args.key, "en")
-    wash = await wash_or_not_to_wash(weather_pops, args.percentage, args.days)
+async def main(address, key, percentage, days):
+    weather_pops = await check_weather(address, key, "en")
+    wash = await wash_or_not_to_wash(weather_pops, percentage, days)
     pretty = await prettify_wash(wash)
+    print(pretty)
     return pretty
 
 
@@ -176,4 +177,4 @@ if __name__ == "__main__":
     # TODO: rename function to something unique
     #    asyncio.run(check_car_wash(args.days, args.percentage, args.address, args.key, "en"))
 
-    asyncio.run(main())
+    asyncio.run(main(args.address, args.key, args.percentage, args.days))
